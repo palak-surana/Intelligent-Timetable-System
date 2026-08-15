@@ -14,3 +14,12 @@ dist/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# Python cache anywhere
+**/__pycache__/
+**/*.pyc

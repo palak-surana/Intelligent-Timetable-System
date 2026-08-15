@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Faculty() {
   const [showForm, setShowForm] = useState(false);
 
   const [facultyList, setFacultyList] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -14,16 +18,55 @@ function Faculty() {
     department: "Data Science",
   });
 
+  // ==========================================
+  // LOAD FACULTY DATA FROM FASTAPI
+  // ==========================================
+
+  const loadFaculty = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/faculty"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch faculty data");
+      }
+
+      const data = await response.json();
+
+      setFacultyList(data);
+    } catch (error) {
+      console.error("Error fetching faculty:", error);
+      setFacultyList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFaculty();
+  }, []);
+
+  // ==========================================
+  // FORM INPUT CHANGE
+  // ==========================================
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((previousData) => ({
+      ...previousData,
       [name]: value,
-    });
+    }));
   };
 
-  const handleSave = (e) => {
+  // ==========================================
+  // SAVE FACULTY TO FASTAPI
+  // ==========================================
+
+  const handleSave = async (e) => {
     e.preventDefault();
 
     if (
@@ -38,37 +81,106 @@ function Faculty() {
     }
 
     const newFaculty = {
-      ...formData,
       id: Date.now(),
+      name: formData.name,
+      facultyId: formData.facultyId,
+      email: formData.email,
+      designation: formData.designation,
+      maxHours: Number(formData.maxHours),
+      department: formData.department,
     };
 
-    setFacultyList([...facultyList, newFaculty]);
+    try {
+      setSaving(true);
 
-    setFormData({
-      name: "",
-      facultyId: "",
-      email: "",
-      designation: "",
-      maxHours: "",
-      department: "Data Science",
-    });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/faculty",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newFaculty),
+        }
+      );
 
-    setShowForm(false);
+      if (!response.ok) {
+        throw new Error("Failed to save faculty");
+      }
+
+      const result = await response.json();
+
+      console.log("Faculty saved successfully:", result);
+
+      // Reload data from backend
+      await loadFaculty();
+
+      // Reset form
+      setFormData({
+        name: "",
+        facultyId: "",
+        email: "",
+        designation: "",
+        maxHours: "",
+        department: "Data Science",
+      });
+
+      setShowForm(false);
+
+      alert("Faculty added successfully!");
+    } catch (error) {
+      console.error("Error saving faculty:", error);
+
+      alert(
+        "Could not save faculty. Please make sure the backend is running."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
+
+  // ==========================================
+  // DELETE FACULTY
+  // ==========================================
 
   const handleDelete = (id) => {
-    setFacultyList(
-      facultyList.filter((faculty) => faculty.id !== id)
+    setFacultyList((previousList) =>
+      previousList.filter((faculty) => faculty.id !== id)
     );
   };
+
+  // ==========================================
+  // WORKLOAD STATUS
+  // ==========================================
+
+  const getUnderloadedCount = () => {
+    return facultyList.filter(
+      (faculty) => Number(faculty.maxHours) < 10
+    ).length;
+  };
+
+  const getOverloadedCount = () => {
+    return facultyList.filter(
+      (faculty) => Number(faculty.maxHours) > 20
+    ).length;
+  };
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <main className="page">
 
-      {/* Header */}
+      {/* ======================================
+          HEADER
+      ====================================== */}
+
       <div className="page-header">
+
         <div>
           <h1>Faculty Management</h1>
+
           <p>
             Manage Data Science faculty and their teaching workload.
           </p>
@@ -80,14 +192,25 @@ function Faculty() {
         >
           {showForm ? "Close Form" : "+ Add Faculty"}
         </button>
+
       </div>
 
-      {/* Add Faculty Form */}
+
+      {/* ======================================
+          ADD FACULTY FORM
+      ====================================== */}
+
       {showForm && (
-        <form className="faculty-form" onSubmit={handleSave}>
+        <form
+          className="faculty-form"
+          onSubmit={handleSave}
+        >
+
           <h2>Add Faculty</h2>
 
           <div className="form-grid">
+
+            {/* Faculty Name */}
 
             <input
               type="text"
@@ -97,6 +220,9 @@ function Faculty() {
               onChange={handleChange}
             />
 
+
+            {/* Faculty ID */}
+
             <input
               type="text"
               name="facultyId"
@@ -104,6 +230,9 @@ function Faculty() {
               value={formData.facultyId}
               onChange={handleChange}
             />
+
+
+            {/* Email */}
 
             <input
               type="email"
@@ -113,20 +242,35 @@ function Faculty() {
               onChange={handleChange}
             />
 
+
+            {/* Designation */}
+
             <select
               name="designation"
               value={formData.designation}
               onChange={handleChange}
             >
-              <option value="">Select Designation</option>
-              <option value="Professor">Professor</option>
+
+              <option value="">
+                Select Designation
+              </option>
+
+              <option value="Professor">
+                Professor
+              </option>
+
               <option value="Associate Professor">
                 Associate Professor
               </option>
+
               <option value="Assistant Professor">
                 Assistant Professor
               </option>
+
             </select>
+
+
+            {/* Maximum Weekly Hours */}
 
             <input
               type="number"
@@ -134,25 +278,45 @@ function Faculty() {
               placeholder="Maximum Weekly Hours"
               value={formData.maxHours}
               onChange={handleChange}
+              min="1"
             />
+
+
+            {/* Department */}
 
             <select
               name="department"
               value={formData.department}
               onChange={handleChange}
             >
-              <option value="Data Science">Data Science</option>
+
+              <option value="Data Science">
+                Data Science
+              </option>
+
             </select>
 
           </div>
 
-          <button type="submit" className="save-button">
-            Save Faculty
+
+          {/* Save Button */}
+
+          <button
+            type="submit"
+            className="save-button"
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Faculty"}
           </button>
+
         </form>
       )}
 
-      {/* Summary Cards */}
+
+      {/* ======================================
+          SUMMARY CARDS
+      ====================================== */}
+
       <div className="faculty-summary">
 
         <div className="summary-card">
@@ -167,52 +331,101 @@ function Faculty() {
 
         <div className="summary-card">
           <span>Underloaded</span>
-          <strong>0</strong>
+          <strong>{getUnderloadedCount()}</strong>
         </div>
 
         <div className="summary-card">
           <span>Overloaded</span>
-          <strong>0</strong>
+          <strong>{getOverloadedCount()}</strong>
         </div>
 
       </div>
 
-      {/* Faculty Table */}
+
+      {/* ======================================
+          FACULTY TABLE
+      ====================================== */}
+
       <div className="faculty-table">
 
         <div className="table-header">
+
           <span>Faculty ID</span>
+
           <span>Name</span>
+
           <span>Designation</span>
+
           <span>Max Hours</span>
+
           <span>Action</span>
+
         </div>
 
-        {facultyList.length === 0 ? (
+
+        {/* Loading */}
+
+        {loading ? (
 
           <div className="empty-state">
-            <h3>No faculty added yet</h3>
+
+            <h3>Loading faculty...</h3>
+
             <p>
-              Add your Data Science faculty to start building
-              the workload system.
+              Getting faculty information from the backend.
             </p>
+
+          </div>
+
+        ) : facultyList.length === 0 ? (
+
+          /* Empty State */
+
+          <div className="empty-state">
+
+            <h3>No faculty added yet</h3>
+
+            <p>
+              Add your Data Science faculty to start
+              building the workload system.
+            </p>
+
           </div>
 
         ) : (
 
-          facultyList.map((faculty) => (
-            <div className="table-row" key={faculty.id}>
+          /* Faculty Rows */
 
-              <span>{faculty.facultyId}</span>
+          facultyList.map((faculty) => (
+
+            <div
+              className="table-row"
+              key={faculty.id}
+            >
 
               <span>
-                <strong>{faculty.name}</strong>
-                <small>{faculty.email}</small>
+                {faculty.facultyId || faculty.id}
               </span>
 
-              <span>{faculty.designation}</span>
+              <span>
 
-              <span>{faculty.maxHours} hrs/week</span>
+                <strong>
+                  {faculty.name}
+                </strong>
+
+                <small>
+                  {faculty.email}
+                </small>
+
+              </span>
+
+              <span>
+                {faculty.designation}
+              </span>
+
+              <span>
+                {faculty.maxHours} hrs/week
+              </span>
 
               <button
                 className="delete-button"
@@ -222,6 +435,7 @@ function Faculty() {
               </button>
 
             </div>
+
           ))
 
         )}

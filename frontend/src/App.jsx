@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
@@ -12,6 +13,19 @@ import Workload from "./pages/Workload";
 import Rooms from "./pages/Rooms";
 
 function App() {
+  const [backendStatus, setBackendStatus] = useState("Checking...");
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/health")
+      .then((response) => response.json())
+      .then((data) => {
+        setBackendStatus(data.status);
+      })
+      .catch(() => {
+        setBackendStatus("Backend not connected");
+      });
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="app">
@@ -19,6 +33,10 @@ function App() {
 
         <div className="main">
           <Navbar />
+
+          <div className="backend-status">
+            Backend: {backendStatus}
+          </div>
 
           <Routes>
             <Route path="/" element={<Dashboard />} />
