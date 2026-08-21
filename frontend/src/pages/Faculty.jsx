@@ -9,6 +9,8 @@ function Faculty() {
 
   const [saving, setSaving] = useState(false);
 
+  const [deletingId, setDeletingId] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     facultyId: "",
@@ -19,7 +21,7 @@ function Faculty() {
   });
 
   // ==========================================
-  // LOAD FACULTY DATA FROM FASTAPI
+  // LOAD FACULTY FROM FASTAPI
   // ==========================================
 
   const loadFaculty = async () => {
@@ -39,12 +41,14 @@ function Faculty() {
       setFacultyList(data);
     } catch (error) {
       console.error("Error fetching faculty:", error);
+
       setFacultyList([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Load faculty when page opens
   useEffect(() => {
     loadFaculty();
   }, []);
@@ -63,12 +67,28 @@ function Faculty() {
   };
 
   // ==========================================
+  // RESET FORM
+  // ==========================================
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      facultyId: "",
+      email: "",
+      designation: "",
+      maxHours: "",
+      department: "Data Science",
+    });
+  };
+
+  // ==========================================
   // SAVE FACULTY TO FASTAPI
   // ==========================================
 
   const handleSave = async (e) => {
     e.preventDefault();
 
+    // Validate form
     if (
       !formData.name ||
       !formData.facultyId ||
@@ -80,8 +100,7 @@ function Faculty() {
       return;
     }
 
-    const newFaculty = {
-      id: Date.now(),
+    const facultyData = {
       name: formData.name,
       facultyId: formData.facultyId,
       email: formData.email,
@@ -97,56 +116,103 @@ function Faculty() {
         "http://127.0.0.1:8000/api/faculty",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(newFaculty),
+
+          body: JSON.stringify(facultyData),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to save faculty");
-      }
-
       const result = await response.json();
 
-      console.log("Faculty saved successfully:", result);
+      // Backend error
+      if (!response.ok) {
+        throw new Error(
+          result.detail || "Failed to save faculty"
+        );
+      }
 
-      // Reload data from backend
+      console.log(
+        "Faculty saved successfully:",
+        result
+      );
+
+      // Reload from database
       await loadFaculty();
 
       // Reset form
-      setFormData({
-        name: "",
-        facultyId: "",
-        email: "",
-        designation: "",
-        maxHours: "",
-        department: "Data Science",
-      });
+      resetForm();
 
+      // Close form
       setShowForm(false);
 
       alert("Faculty added successfully!");
-    } catch (error) {
-      console.error("Error saving faculty:", error);
 
-      alert(
-        "Could not save faculty. Please make sure the backend is running."
+    } catch (error) {
+      console.error(
+        "Error saving faculty:",
+        error
       );
+
+      alert(error.message);
     } finally {
       setSaving(false);
     }
   };
 
   // ==========================================
-  // DELETE FACULTY
+  // DELETE FACULTY FROM FASTAPI
   // ==========================================
 
-  const handleDelete = (id) => {
-    setFacultyList((previousList) =>
-      previousList.filter((faculty) => faculty.id !== id)
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this faculty?"
     );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      setDeletingId(id);
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/faculty/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.detail || "Failed to delete faculty"
+        );
+      }
+
+      console.log(
+        "Faculty deleted:",
+        result
+      );
+
+      // Reload from database
+      await loadFaculty();
+
+      alert("Faculty deleted successfully!");
+
+    } catch (error) {
+      console.error(
+        "Error deleting faculty:",
+        error
+      );
+
+      alert(error.message);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   // ==========================================
@@ -155,13 +221,15 @@ function Faculty() {
 
   const getUnderloadedCount = () => {
     return facultyList.filter(
-      (faculty) => Number(faculty.maxHours) < 10
+      (faculty) =>
+        Number(faculty.maxHours) < 10
     ).length;
   };
 
   const getOverloadedCount = () => {
     return facultyList.filter(
-      (faculty) => Number(faculty.maxHours) > 20
+      (faculty) =>
+        Number(faculty.maxHours) > 20
     ).length;
   };
 
@@ -182,15 +250,20 @@ function Faculty() {
           <h1>Faculty Management</h1>
 
           <p>
-            Manage Data Science faculty and their teaching workload.
+            Manage Data Science faculty and
+            their teaching workload.
           </p>
         </div>
 
         <button
           className="primary-button"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() =>
+            setShowForm(!showForm)
+          }
         >
-          {showForm ? "Close Form" : "+ Add Faculty"}
+          {showForm
+            ? "Close Form"
+            : "+ Add Faculty"}
         </button>
 
       </div>
@@ -279,6 +352,7 @@ function Faculty() {
               value={formData.maxHours}
               onChange={handleChange}
               min="1"
+              max="60"
             />
 
 
@@ -306,7 +380,9 @@ function Faculty() {
             className="save-button"
             disabled={saving}
           >
-            {saving ? "Saving..." : "Save Faculty"}
+            {saving
+              ? "Saving..."
+              : "Save Faculty"}
           </button>
 
         </form>
@@ -321,22 +397,37 @@ function Faculty() {
 
         <div className="summary-card">
           <span>Total Faculty</span>
-          <strong>{facultyList.length}</strong>
+
+          <strong>
+            {facultyList.length}
+          </strong>
         </div>
+
 
         <div className="summary-card">
           <span>Available</span>
-          <strong>{facultyList.length}</strong>
+
+          <strong>
+            {facultyList.length}
+          </strong>
         </div>
+
 
         <div className="summary-card">
           <span>Underloaded</span>
-          <strong>{getUnderloadedCount()}</strong>
+
+          <strong>
+            {getUnderloadedCount()}
+          </strong>
         </div>
+
 
         <div className="summary-card">
           <span>Overloaded</span>
-          <strong>{getOverloadedCount()}</strong>
+
+          <strong>
+            {getOverloadedCount()}
+          </strong>
         </div>
 
       </div>
@@ -348,31 +439,46 @@ function Faculty() {
 
       <div className="faculty-table">
 
+        {/* Table Header */}
+
         <div className="table-header">
 
-          <span>Faculty ID</span>
+          <span>
+            Faculty ID
+          </span>
 
-          <span>Name</span>
+          <span>
+            Name
+          </span>
 
-          <span>Designation</span>
+          <span>
+            Designation
+          </span>
 
-          <span>Max Hours</span>
+          <span>
+            Max Hours
+          </span>
 
-          <span>Action</span>
+          <span>
+            Action
+          </span>
 
         </div>
 
 
-        {/* Loading */}
+        {/* Loading State */}
 
         {loading ? (
 
           <div className="empty-state">
 
-            <h3>Loading faculty...</h3>
+            <h3>
+              Loading faculty...
+            </h3>
 
             <p>
-              Getting faculty information from the backend.
+              Getting faculty information
+              from the database.
             </p>
 
           </div>
@@ -383,11 +489,14 @@ function Faculty() {
 
           <div className="empty-state">
 
-            <h3>No faculty added yet</h3>
+            <h3>
+              No faculty added yet
+            </h3>
 
             <p>
-              Add your Data Science faculty to start
-              building the workload system.
+              Add your Data Science faculty
+              to start building the workload
+              system.
             </p>
 
           </div>
@@ -403,9 +512,14 @@ function Faculty() {
               key={faculty.id}
             >
 
+              {/* Faculty ID */}
+
               <span>
-                {faculty.facultyId || faculty.id}
+                {faculty.facultyId}
               </span>
+
+
+              {/* Name + Email */}
 
               <span>
 
@@ -419,19 +533,35 @@ function Faculty() {
 
               </span>
 
+
+              {/* Designation */}
+
               <span>
                 {faculty.designation}
               </span>
+
+
+              {/* Maximum Hours */}
 
               <span>
                 {faculty.maxHours} hrs/week
               </span>
 
+
+              {/* Delete */}
+
               <button
                 className="delete-button"
-                onClick={() => handleDelete(faculty.id)}
+                onClick={() =>
+                  handleDelete(faculty.id)
+                }
+                disabled={
+                  deletingId === faculty.id
+                }
               >
-                Delete
+                {deletingId === faculty.id
+                  ? "Deleting..."
+                  : "Delete"}
               </button>
 
             </div>
