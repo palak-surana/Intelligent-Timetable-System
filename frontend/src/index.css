@@ -28,6 +28,9 @@ body {
 }
 
 .nav-item {
+  display: block;
+  color: white;
+  text-decoration: none;
   padding: 14px 16px;
   margin-bottom: 8px;
   border-radius: 8px;
@@ -125,26 +128,10 @@ body {
   font-weight: bold;
 }
 
-/* Sidebar links */
-.nav-item {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 14px 16px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-}
+/* ============================= */
+/* PAGE CONTENT */
+/* ============================= */
 
-.nav-item:hover {
-  background: #2563eb;
-}
-
-.nav-item.active {
-  background: #2563eb;
-}
-
-/* Page content */
 .page {
   padding: 35px;
 }
@@ -168,6 +155,10 @@ body {
   margin-bottom: 8px;
 }
 
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
 .primary-button,
 .save-button {
   border: none;
@@ -184,6 +175,10 @@ body {
 .save-button:hover {
   background: #1d4ed8;
 }
+
+/* ============================= */
+/* FACULTY */
+/* ============================= */
 
 .faculty-form {
   background: white;
@@ -258,18 +253,6 @@ body {
   font-weight: 600;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.empty-state h3 {
-  margin-bottom: 8px;
-}
-
-.empty-state p {
-  color: #6b7280;
-}
 .table-row {
   display: grid;
   grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr;
@@ -297,6 +280,28 @@ body {
 .delete-button:hover {
   background: #b91c1c;
 }
+
+/* ============================= */
+/* EMPTY STATE */
+/* ============================= */
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: #6b7280;
+}
+
+/* ============================= */
+/* CLASS */
+/* ============================= */
+
 .class-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -348,6 +353,11 @@ body {
   font-size: 13px;
   font-weight: 600;
 }
+
+/* ============================= */
+/* SUBJECT */
+/* ============================= */
+
 .subject-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -396,6 +406,11 @@ body {
 .subject-header {
   grid-template-columns: 1fr 2fr 1fr 1.5fr 1.5fr;
 }
+
+/* ============================= */
+/* ROOMS */
+/* ============================= */
+
 .room-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -442,6 +457,11 @@ body {
 .room-card strong {
   color: #374151;
 }
+
+/* ============================= */
+/* TIMETABLE CONTROLS */
+/* ============================= */
+
 .timetable-controls {
   display: flex;
   gap: 15px;
@@ -455,6 +475,10 @@ body {
   background: white;
   font-size: 14px;
 }
+
+/* ============================= */
+/* TIMETABLE */
+/* ============================= */
 
 .timetable-container {
   background: white;
@@ -494,6 +518,32 @@ body {
   color: #9ca3af;
   font-size: 13px;
 }
+
+.timetable-slot {
+  padding: 8px;
+  border-radius: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  margin: 3px;
+}
+
+.timetable-slot strong {
+  display: block;
+  color: #1e3a8a;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.timetable-slot small {
+  display: block;
+  color: #4b5563;
+  margin-top: 3px;
+}
+
+/* ============================= */
+/* WORKLOAD */
+/* ============================= */
+
 .workload-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -546,6 +596,11 @@ body {
   color: #6b7280;
   font-size: 14px;
 }
+
+/* ============================= */
+/* BACKEND STATUS */
+/* ============================= */
+
 .backend-status {
   display: inline-block;
   margin: 15px 30px;
@@ -554,4 +609,708 @@ body {
   background: #dcfce7;
   color: #166534;
   font-weight: bold;
+}
+/* =========================================================
+   OFFICIAL MIT TIMETABLE - REFERENCE FORMAT
+   ========================================================= */
+
+/* Main page */
+.page {
+  padding: 18px;
+}
+
+.timetable-controls {
+  display: flex;
+  gap: 18px;
+  margin: 0 0 20px;
+}
+
+.timetable-controls select {
+  min-width: 170px;
+  padding: 11px 14px;
+  border: 1px solid #cfd4dc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  font-size: 14px;
+}
+
+/* Outer paper */
+.mit-timetable-wrapper {
+  width: 100%;
+  margin-top: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #cfd4dc;
+  border-radius: 5px;
+  box-shadow: none;
+  overflow-x: auto;
+}
+
+.mit-timetable {
+  width: 100%;
+  min-width: 1250px;
+  padding: 22px;
+  background: #fff;
+  color: #111;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================================
+   COLLEGE HEADER
+   ========================================================= */
+
+.mit-header {
+  width: 100%;
+  border: 1px solid #111827;
+  padding: 10px 12px 8px;
+}
+
+.mit-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mit-logo {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border: 2px solid #111827;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mit-logo-area h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.mit-logo-area small {
+  display: block;
+  margin-top: 3px;
+  color: #111827;
+  font-size: 13px;
+}
+
+.mit-title {
+  margin-top: 6px;
+}
+
+.mit-title h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 30px;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.mit-title p {
+  margin: 10px 0 4px;
+  color: #374151;
+  font-size: 16px;
+}
+
+.mit-details {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content;
+  column-gap: 32px;
+  row-gap: 2px;
+  margin-top: 2px;
+}
+
+.mit-details div {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.mit-details strong {
+  color: #111827;
+}
+
+.mit-details span {
+  color: #111827;
+}
+
+/* =========================================================
+   MAIN TIMETABLE
+   ========================================================= */
+
+.mit-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.mit-class-table {
+  width: 100%;
+  min-width: 1250px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.mit-class-table th,
+.mit-class-table td {
+  border: 1px solid #111827;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mit-class-table thead th {
+  height: 52px;
+  padding: 5px 3px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.mit-class-table thead .day-header {
+  width: 62px;
+}
+
+.mit-class-table tbody td {
+  height: 76px;
+  font-size: 12px;
+}
+
+.day-cell {
+  width: 62px;
+  background: #fff;
+  color: #111827;
+  font-weight: 500;
+}
+
+.break-header {
+  background: #f3f4f6 !important;
+}
+
+.break-cell {
+  width: 45px;
+  background: #fff;
+  color: #111827;
+  font-size: 11px !important;
+  font-weight: 400;
+  text-align: left !important;
+  padding-left: 8px !important;
+}
+
+.free-cell {
+  background: #fff;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.occupied-cell {
+  padding: 5px 6px !important;
+  background: #fff;
+}
+
+.mit-timetable-entry {
+  width: 100%;
+  min-height: 64px;
+  padding: 5px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  background: #f8fafc;
+}
+
+.mit-timetable-entry strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mit-timetable-entry span {
+  display: block;
+  margin-top: 1px;
+  color: #111827;
+  font-size: 9px;
+}
+
+.theory-entry,
+.lab-entry {
+  background: #f8fafc;
+}
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
+
+.mit-legend {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid #111827;
+  background: #fff;
+  color: #111827;
+  font-size: 11px;
+}
+
+.mit-legend span {
+  white-space: nowrap;
+}
+
+.mit-legend b {
+  font-weight: 700;
+}
+
+/* =========================================================
+   COURSE INFORMATION
+   ========================================================= */
+
+/* This is the important part:
+   Theory = LEFT, Labs = RIGHT, same row */
+.course-information {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: 22px;
+  margin-top: 8px;
+  align-items: start;
+}
+
+.course-section {
+  min-width: 0;
+}
+
+.course-section h3 {
+  margin: 0 0 3px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #111827;
+  font-size: 18px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.course-section table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.course-section th,
+.course-section td {
+  border: 1px solid #111827;
+  color: #111827;
+  padding: 5px 5px;
+  font-size: 10px;
+  line-height: 1.15;
+  vertical-align: middle;
+}
+
+.course-section th {
+  background: #fff;
+  text-align: center;
+  font-weight: 700;
+}
+
+.course-section td {
+  text-align: left;
+  font-weight: 400;
+}
+
+/* Theory table widths */
+.theory-section th:nth-child(1),
+.theory-section td:nth-child(1) {
+  width: 20%;
+}
+
+.theory-section th:nth-child(2),
+.theory-section td:nth-child(2) {
+  width: 35%;
+}
+
+.theory-section th:nth-child(3),
+.theory-section td:nth-child(3) {
+  width: 29%;
+}
+
+.theory-section th:nth-child(4),
+.theory-section td:nth-child(4) {
+  width: 16%;
+}
+
+/* Lab table widths */
+.lab-section th:nth-child(1),
+.lab-section td:nth-child(1) {
+  width: 18%;
+}
+
+.lab-section th:nth-child(2),
+.lab-section td:nth-child(2) {
+  width: 27%;
+}
+
+.lab-section th:nth-child(3),
+.lab-section td:nth-child(3) {
+  width: 25%;
+}
+
+.lab-section th:nth-child(4),
+.lab-section td:nth-child(4) {
+  width: 14%;
+}
+
+.lab-section th:nth-child(5),
+.lab-section td:nth-child(5) {
+  width: 16%;
+}
+
+.no-data {
+  text-align: center !important;
+  color: #374151 !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.mit-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 28px;
+  margin-top: 5px;
+  padding: 0;
+  border: none;
+  background: #fff;
+  color: #111827;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.mit-footer strong {
+  font-weight: 700;
+}
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.primary-button {
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+.primary-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .mit-timetable {
+    padding: 12px;
+  }
+
+  .course-information {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .mit-details {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 15px;
+  }
+
+  .timetable-controls {
+    flex-direction: column;
+  }
+
+  .timetable-controls select {
+    width: 100%;
+  }
+
+  .mit-logo-area {
+    align-items: flex-start;
+  }
+
+  .mit-title h1 {
+    font-size: 24px;
+  }
+
+  .mit-title p {
+    font-size: 13px;
+  }
+
+  .mit-details {
+    grid-template-columns: 1fr;
+  }
+
+  .mit-legend {
+    justify-content: flex-start;
+    gap: 10px 18px;
+  }
+}
+/* =========================================================
+   FINAL MIT HEADER - EXACT BOX / TABLE FORMAT
+   ========================================================= */
+
+.mit-header {
+  width: 100%;
+  min-height: 135px;
+  display: grid;
+  grid-template-columns: 27% 38% 35%;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-family: "Times New Roman", Times, serif;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LEFT SECTION
+   ========================================================= */
+
+.mit-college-block {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  grid-template-rows: 58px 22px auto;
+  min-width: 0;
+  border-right: 1px solid #111;
+  box-sizing: border-box;
+}
+
+.mit-logo-image {
+  width: 105px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
+  margin: 3px auto;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.mit-college-text {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2px 4px;
+  text-align: left;
+  border-left: 1px solid #111;
+  box-sizing: border-box;
+}
+
+.mit-college-name {
+  font-size: 18px;
+  line-height: 1.05;
+  font-weight: 700;
+  text-align: left;
+}
+
+.mit-affiliation {
+  font-size: 7px;
+  line-height: 1.05;
+  margin-top: 3px;
+  text-align: left;
+}
+
+.mit-location {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.mit-department {
+  grid-column: 1 / 3;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* =========================================================
+   CENTER SECTION
+   ========================================================= */
+
+.mit-title-block {
+  display: grid;
+  grid-template-rows: 35px 25px 25px 25px;
+  min-width: 0;
+  border-right: 1px solid #111;
+  box-sizing: border-box;
+}
+
+.mit-main-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #111;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.mit-academic-row {
+  display: grid;
+  grid-template-columns: 48% 8% 44%;
+  align-items: center;
+  border-bottom: 1px solid #111;
+  min-width: 0;
+}
+
+.mit-academic-row:last-child {
+  border-bottom: none;
+}
+
+.mit-academic-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mit-colon {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mit-academic-value {
+  text-align: center;
+  font-size: 10px;
+}
+
+/* =========================================================
+   RIGHT SECTION
+   ========================================================= */
+
+.mit-right-details {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  min-width: 0;
+}
+
+.mit-info-row {
+  display: grid;
+  grid-template-columns: 48% 7% 45%;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid #111;
+  box-sizing: border-box;
+}
+
+.mit-info-row:last-child {
+  border-bottom: none;
+}
+
+.mit-info-row strong {
+  font-size: 9px;
+  text-align: center;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mit-info-row span:nth-child(2) {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mit-info-row span:last-child {
+  font-size: 9px;
+  text-align: center;
+  padding: 0 3px;
+  line-height: 1.05;
+  word-break: normal;
+}
+
+/* =========================================================
+   REMOVE OLD HEADER STYLES THAT CAUSE LARGE SPACING
+   ========================================================= */
+
+.mit-header .mit-logo {
+  display: none;
+}
+
+.mit-header .mit-title {
+  display: none;
+}
+
+.mit-header .mit-details {
+  display: none;
+}
+
+/* =========================================================
+   TIMETABLE SHOULD START CLOSE TO HEADER
+   ========================================================= */
+
+.mit-table-scroll {
+  margin-top: 0 !important;
+}
+
+.mit-class-table {
+  margin-top: 0 !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .mit-header {
+    min-width: 900px;
+    grid-template-columns: 27% 38% 35%;
+  }
 }
