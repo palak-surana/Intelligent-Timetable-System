@@ -72,16 +72,20 @@ def health_check():
 @app.get("/api/faculty")
 def get_faculty(db: Session = Depends(get_db)):
 
-    faculty = db.query(models.Faculty).all()
+    faculty = (
+        db.query(models.Faculty)
+        .order_by(models.Faculty.name)
+        .all()
+    )
 
     return [
         {
             "id": item.id,
             "name": item.name,
-            "facultyId": item.facultyId,
+            "facultyId": item.faculty_id,
             "email": item.email,
             "designation": item.designation,
-            "maxHours": item.maxHours,
+            "maxHours": item.max_hours,
             "department": item.department,
         }
         for item in faculty
@@ -98,12 +102,18 @@ def add_faculty(
     db: Session = Depends(get_db)
 ):
 
-    # Check if Faculty ID already exists
+    faculty_id = faculty_data.get("facultyId")
+
+    if not faculty_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Faculty ID is required"
+        )
+
     existing_faculty = (
         db.query(models.Faculty)
         .filter(
-            models.Faculty.facultyId
-            == faculty_data["facultyId"]
+            models.Faculty.faculty_id == faculty_id
         )
         .first()
     )
@@ -116,10 +126,12 @@ def add_faculty(
 
     new_faculty = models.Faculty(
         name=faculty_data["name"],
-        facultyId=faculty_data["facultyId"],
-        email=faculty_data["email"],
-        designation=faculty_data["designation"],
-        maxHours=int(faculty_data["maxHours"]),
+        faculty_id=faculty_id,
+        email=faculty_data.get("email"),
+        designation=faculty_data.get("designation"),
+        max_hours=float(
+            faculty_data.get("maxHours", 0)
+        ),
         department=faculty_data.get(
             "department",
             "Data Science"
@@ -135,10 +147,10 @@ def add_faculty(
         "faculty": {
             "id": new_faculty.id,
             "name": new_faculty.name,
-            "facultyId": new_faculty.facultyId,
+            "facultyId": new_faculty.faculty_id,
             "email": new_faculty.email,
             "designation": new_faculty.designation,
-            "maxHours": new_faculty.maxHours,
+            "maxHours": new_faculty.max_hours,
             "department": new_faculty.department,
         }
     }
@@ -181,8 +193,63 @@ def delete_faculty(
 # ==========================================
 
 @app.get("/api/classes")
-def get_classes():
-    return []
+def get_classes(
+    db: Session = Depends(get_db)
+):
+
+    classes = (
+        db.query(models.Class)
+        .order_by(
+            models.Class.year,
+            models.Class.division
+        )
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "year": item.year,
+            "division": item.division,
+            "department": item.department,
+            "semester": item.semester,
+            "status": item.status,
+
+            # Convenient display name
+            "className": (
+                f"{item.year} "
+                f"{item.department} "
+                f"{item.division}"
+            ),
+        }
+        for item in classes
+    ]
+
+
+# ==========================================
+# BATCHES API
+# ==========================================
+
+@app.get("/api/batches")
+def get_batches(
+    db: Session = Depends(get_db)
+):
+
+    batches = (
+        db.query(models.Batch)
+        .order_by(models.Batch.name)
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "name": item.name,
+            "className": item.class_name,
+            "status": item.status,
+        }
+        for item in batches
+    ]
 
 
 # ==========================================
@@ -190,8 +257,34 @@ def get_classes():
 # ==========================================
 
 @app.get("/api/subjects")
-def get_subjects():
-    return []
+def get_subjects(
+    db: Session = Depends(get_db)
+):
+
+    subjects = (
+        db.query(models.Subject)
+        .order_by(models.Subject.code)
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "code": item.code,
+            "name": item.name,
+            "subjectType": item.subject_type,
+            "weeklySessions": item.weekly_sessions,
+            "durationMinutes": item.duration_minutes,
+            "department": item.department,
+
+            # Useful for timetable UI
+            "isLab": (
+                item.subject_type.lower()
+                in ["practical", "lab"]
+            ),
+        }
+        for item in subjects
+    ]
 
 
 # ==========================================
@@ -199,8 +292,79 @@ def get_subjects():
 # ==========================================
 
 @app.get("/api/rooms")
-def get_rooms():
-    return []
+def get_rooms(
+    db: Session = Depends(get_db)
+):
+
+    rooms = (
+        db.query(models.Room)
+        .order_by(models.Room.name)
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "name": item.name,
+            "roomType": item.room_type,
+            "capacity": item.capacity,
+            "status": item.status,
+        }
+        for item in rooms
+    ]
+
+
+# ==========================================
+# WORKING DAYS API
+# ==========================================
+
+@app.get("/api/working-days")
+def get_working_days(
+    db: Session = Depends(get_db)
+):
+
+    days = (
+        db.query(models.WorkingDay)
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "day": item.day,
+            "isWorking": item.is_working,
+        }
+        for item in days
+    ]
+
+
+# ==========================================
+# TIME SLOTS API
+# ==========================================
+
+@app.get("/api/time-slots")
+def get_time_slots(
+    db: Session = Depends(get_db)
+):
+
+    slots = (
+        db.query(models.TimeSlot)
+        .order_by(models.TimeSlot.slot_number)
+        .all()
+    )
+
+    return [
+        {
+            "id": item.id,
+            "slotNumber": item.slot_number,
+            "startTime": item.start_time,
+            "endTime": item.end_time,
+            "durationMinutes": item.duration_minutes,
+            "isBreak": item.is_break,
+            "breakType": item.break_type,
+        }
+        for item in slots
+    ]
 
 
 # ==========================================
@@ -208,8 +372,125 @@ def get_rooms():
 # ==========================================
 
 @app.get("/api/timetable")
-def get_timetable():
-    return []
+def get_timetable(
+    db: Session = Depends(get_db)
+):
+
+    timetable = (
+        db.query(models.Timetable)
+        .all()
+    )
+
+    # Proper day order
+    day_order = {
+        "Monday": 1,
+        "Tuesday": 2,
+        "Wednesday": 3,
+        "Thursday": 4,
+        "Friday": 5,
+        "Saturday": 6,
+    }
+
+    timetable.sort(
+        key=lambda x: (
+            day_order.get(x.day, 99),
+            x.time_slot
+        )
+    )
+
+    return [
+        {
+            "id": item.id,
+
+            "day": item.day,
+
+            # Main field
+            "timeSlot": item.time_slot,
+
+            # Compatibility with existing React code
+            "time": item.time_slot,
+
+            "className": item.class_name,
+
+            "batchName": (
+                item.batch_name
+                if item.batch_name
+                else "ALL"
+            ),
+
+            "subject": item.subject,
+
+            "faculty": item.faculty,
+
+            "room": item.room,
+
+            "durationMinutes": item.duration_minutes,
+
+            # Useful for UI
+            "isLab": item.duration_minutes >= 100,
+        }
+        for item in timetable
+    ]
+
+
+# ==========================================
+# TIMETABLE BY CLASS
+# ==========================================
+
+@app.get("/api/timetable/{class_name}")
+def get_class_timetable(
+    class_name: str,
+    db: Session = Depends(get_db)
+):
+
+    timetable = (
+        db.query(models.Timetable)
+        .filter(
+            models.Timetable.class_name
+            == class_name
+        )
+        .all()
+    )
+
+    if not timetable:
+        return []
+
+    day_order = {
+        "Monday": 1,
+        "Tuesday": 2,
+        "Wednesday": 3,
+        "Thursday": 4,
+        "Friday": 5,
+        "Saturday": 6,
+    }
+
+    timetable.sort(
+        key=lambda x: (
+            day_order.get(x.day, 99),
+            x.time_slot
+        )
+    )
+
+    return [
+        {
+            "id": item.id,
+            "day": item.day,
+            "timeSlot": item.time_slot,
+            "time": item.time_slot,
+            "className": item.class_name,
+            "batchName": (
+                item.batch_name
+                if item.batch_name
+                else "ALL"
+            ),
+            "subject": item.subject,
+            "faculty": item.faculty,
+            "room": item.room,
+            "durationMinutes": item.duration_minutes,
+            "isLab": item.duration_minutes >= 100,
+        }
+        for item in timetable
+    ]
 
 
 # ==========================================
@@ -217,5 +498,121 @@ def get_timetable():
 # ==========================================
 
 @app.get("/api/workload")
-def get_workload():
-    return []
+def get_workload(
+    db: Session = Depends(get_db)
+):
+
+    faculty = (
+        db.query(models.Faculty)
+        .order_by(models.Faculty.name)
+        .all()
+    )
+
+    result = []
+
+    for item in faculty:
+
+        entries = (
+            db.query(models.Timetable)
+            .filter(
+                models.Timetable.faculty
+                == item.name
+            )
+            .all()
+        )
+
+        total_minutes = sum(
+            entry.duration_minutes
+            for entry in entries
+        )
+
+        used_hours = round(
+            total_minutes / 60,
+            2
+        )
+
+        max_hours = item.max_hours
+
+        result.append(
+            {
+                "id": item.id,
+                "facultyId": item.faculty_id,
+                "name": item.name,
+                "maxHours": max_hours,
+                "usedHours": used_hours,
+                "remainingHours": round(
+                    max_hours - used_hours,
+                    2
+                ),
+                "utilizationPercent": (
+                    round(
+                        (used_hours / max_hours) * 100,
+                        1
+                    )
+                    if max_hours > 0
+                    else 0
+                ),
+            }
+        )
+
+    return result
+
+
+# ==========================================
+# GENERATE TIMETABLE
+# ==========================================
+
+@app.post("/api/generate-timetable")
+def generate_timetable():
+
+    try:
+
+        # Import here so the generator is loaded
+        # only when this API is called.
+        from timetable_generator import (
+            generate_ty_timetable
+        )
+
+        result = generate_ty_timetable()
+
+        return {
+            "status": "success",
+            "message": "TY Data Science A timetable generated successfully",
+            "result": result,
+        }
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )
+
+
+# ==========================================
+# VALIDATE TIMETABLE
+# ==========================================
+
+@app.get("/api/validate-timetable")
+def validate_timetable():
+
+    try:
+
+        from validate_timetable import (
+            validate_timetable
+        )
+
+        result = validate_timetable()
+
+        return {
+            "status": "success",
+            "message": "Timetable validation completed",
+            "result": result,
+        }
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )

@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import mitLogo from "../assets/mit-logo.png";
-
 function Timetable() {
   // ==========================================
   // DAYS
@@ -788,11 +786,10 @@ function Timetable() {
               {/* LEFT: MIT LOGO / COLLEGE */}
               <div className="mit-college-block">
 
-                <img
-                  src={mitLogo}
-                  alt="MIT Academy of Engineering"
-                  className="mit-logo-image"
-                />
+                <div className="mit-logo-text">
+                  <div className="mit-logo-main">MIT</div>
+                  <div className="mit-logo-academy">Academy of Engineering</div>
+                </div>
 
                 <div className="mit-college-text">
                   <div className="mit-college-name">
